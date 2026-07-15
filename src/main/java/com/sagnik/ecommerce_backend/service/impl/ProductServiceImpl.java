@@ -10,6 +10,8 @@ import com.sagnik.ecommerce_backend.repository.CategoryRepository;
 import com.sagnik.ecommerce_backend.repository.ProductRepository;
 import com.sagnik.ecommerce_backend.service.ProductService;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -54,12 +56,13 @@ public class ProductServiceImpl implements ProductService {
         return mapToResponse(product);
     }
     @Override
-    public List<ProductResponse> getAllProducts() {
+    public Page<ProductResponse> getAllProducts(
+            Pageable pageable) {
 
-        return productRepository.findAll()
-                .stream()
-                .map(this::mapToResponse)
-                .toList();
+        Page<Product> products =
+                productRepository.findAll(pageable);
+
+        return products.map(this::mapToResponse);
     }
     private ProductResponse mapToResponse(
             Product product) {
@@ -112,5 +115,17 @@ public class ProductServiceImpl implements ProductService {
                         new ProductNotFoundException("Product not found"));
 
         productRepository.delete(product);
+    }
+
+    @Override
+    public Page<ProductResponse> searchProducts(
+            String keyword,
+            Pageable pageable) {
+
+        return productRepository
+                .findByNameContainingIgnoreCase(
+                        keyword,
+                        pageable)
+                .map(this::mapToResponse);
     }
 }
