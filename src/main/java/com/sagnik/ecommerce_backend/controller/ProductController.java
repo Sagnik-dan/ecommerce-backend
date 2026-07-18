@@ -15,6 +15,8 @@ import org.springframework.data.domain.Pageable;
 
 import org.springframework.web.bind.annotation.*;
 
+import java.math.BigDecimal;
+
 
 @RestController
 @RequestMapping("/api/products")
@@ -30,19 +32,6 @@ public class ProductController {
         return productService.createProduct(request);
     }
 
-    @GetMapping("/{id}")
-    public ProductResponse getProductById(
-            @PathVariable Long id) {
-
-        return productService.getProductById(id);
-    }
-
-    @GetMapping
-    public Page<ProductResponse> getAllProducts(
-            Pageable pageable) {
-
-        return productService.getAllProducts(pageable);
-    }
 
     @PutMapping("/{id}")
     public ProductResponse updateProduct(
@@ -58,13 +47,28 @@ public class ProductController {
         productService.deleteProduct(id);
     }
 
-    @GetMapping("/search")
-    public Page<ProductResponse> searchProducts(
-            @RequestParam String keyword,
+    @GetMapping
+    public Page<ProductResponse> getProducts(
+
+            @RequestParam(required = false)
+            String keyword,
+
+            @RequestParam(required = false)
+            Long categoryId,
+
+            @RequestParam(required = false)
+            BigDecimal minPrice,
+
+            @RequestParam(required = false)
+            BigDecimal maxPrice,
+
             Pageable pageable) {
 
-        return productService.searchProducts(
+        return productService.getProducts(
                 keyword,
+                categoryId,
+                minPrice,
+                maxPrice,
                 pageable);
     }
 }

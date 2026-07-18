@@ -13,7 +13,13 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
+import com.sagnik.ecommerce_backend.specification.ProductSpecification;
 
+import org.springframework.data.jpa.domain.Specification;
+
+import java.math.BigDecimal;
+
+import java.math.BigDecimal;
 import java.util.List;
 @Service
 @RequiredArgsConstructor
@@ -43,26 +49,6 @@ public class ProductServiceImpl implements ProductService {
                 productRepository.save(product);
 
         return mapToResponse(savedProduct);
-    }
-    @Override
-    public ProductResponse getProductById(Long id) {
-
-        Product product =
-                productRepository.findById(id)
-                        .orElseThrow(() ->
-                                new ProductNotFoundException(
-                                        "Product not found"));
-
-        return mapToResponse(product);
-    }
-    @Override
-    public Page<ProductResponse> getAllProducts(
-            Pageable pageable) {
-
-        Page<Product> products =
-                productRepository.findAll(pageable);
-
-        return products.map(this::mapToResponse);
     }
     private ProductResponse mapToResponse(
             Product product) {
@@ -118,14 +104,21 @@ public class ProductServiceImpl implements ProductService {
     }
 
     @Override
-    public Page<ProductResponse> searchProducts(
+    public Page<ProductResponse> getProducts(
             String keyword,
+            Long categoryId,
+            BigDecimal minPrice,
+            BigDecimal maxPrice,
             Pageable pageable) {
 
+        Specification<Product> specification =
+                Specification
+                        .where(ProductSpecification.hasKeyword(keyword))
+                        .and(ProductSpecification.hasCategory(categoryId))
+                        .and(ProductSpecification.hasPriceBetween(minPrice, maxPrice));
+
         return productRepository
-                .findByNameContainingIgnoreCase(
-                        keyword,
-                        pageable)
+                .findAll(specification, pageable)
                 .map(this::mapToResponse);
     }
 }

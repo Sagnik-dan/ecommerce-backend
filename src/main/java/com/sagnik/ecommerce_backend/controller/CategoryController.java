@@ -22,13 +22,7 @@ public class CategoryController {
 
     private final CategoryService categoryService;
     private final ProductService productService;
-
-    @GetMapping
-    public Page<ProductResponse> getAllProducts(
-            Pageable pageable) {
-
-        return productService.getAllProducts(pageable);
-    }
+    
 
     @PostMapping
     public CategoryResponse createCategory(
