@@ -40,5 +40,10 @@ public class User {
     public void prePersist() {
         this.createdAt = LocalDateTime.now();
     }
+    @OneToOne(
+            mappedBy = "user",
+            cascade = CascadeType.ALL
+    )
+    private Cart cart;
 }
 
