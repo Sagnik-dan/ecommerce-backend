@@ -48,4 +48,37 @@ public class GlobalExceptionHandler {
 
         return Map.of("error", ex.getMessage());
     }
+
+    @ExceptionHandler(CartNotFoundException.class)
+    @ResponseStatus(HttpStatus.NOT_FOUND)
+    public Map<String, String> handleCartNotFound(
+            CartNotFoundException ex) {
+
+        return Map.of(
+                "error",
+                ex.getMessage()
+        );
+    }
+
+    @ExceptionHandler(CartItemNotFoundException.class)
+    @ResponseStatus(HttpStatus.NOT_FOUND)
+    public Map<String, String> handleCartItemNotFound(
+            CartItemNotFoundException ex) {
+
+        return Map.of(
+                "error",
+                ex.getMessage()
+        );
+    }
+
+    @ExceptionHandler(UserNotFoundException.class)
+    @ResponseStatus(HttpStatus.NOT_FOUND)
+    public Map<String, String> handleUserNotFound(
+            UserNotFoundException ex) {
+
+        return Map.of(
+                "error",
+                ex.getMessage()
+        );
+    }
 }

@@ -11,11 +11,13 @@ import java.math.BigDecimal;
 @Builder
 public class CartItemResponse {
 
+    private Long cartItemId;
+
     private Long productId;
 
     private String productName;
 
-    private BigDecimal price;
+    private BigDecimal unitPrice;
 
     private Integer quantity;
 

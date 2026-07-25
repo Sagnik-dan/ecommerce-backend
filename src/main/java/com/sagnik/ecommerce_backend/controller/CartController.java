@@ -2,6 +2,7 @@ package com.sagnik.ecommerce_backend.controller;
 
 import com.sagnik.ecommerce_backend.dto.AddToCartRequest;
 import com.sagnik.ecommerce_backend.dto.CartResponse;
+import com.sagnik.ecommerce_backend.dto.UpdateCartItemRequest;
 import com.sagnik.ecommerce_backend.service.CartService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
@@ -33,5 +34,39 @@ public class CartController {
             @PathVariable Long userId) {
 
         return cartService.getCart(userId);
+    }
+
+    @PutMapping("/items/{cartItemId}")
+    public String updateQuantity(
+
+            @PathVariable Long cartItemId,
+
+            @Valid
+            @RequestBody
+            UpdateCartItemRequest request) {
+
+        cartService.updateQuantity(
+                cartItemId,
+                request);
+
+        return "Quantity updated successfully.";
+    }
+
+    @DeleteMapping("/items/{cartItemId}")
+    public String removeItem(
+            @PathVariable Long cartItemId) {
+
+        cartService.removeItem(cartItemId);
+
+        return "Item removed successfully.";
+    }
+
+    @DeleteMapping("/{userId}")
+    public String clearCart(
+            @PathVariable Long userId) {
+
+        cartService.clearCart(userId);
+
+        return "Cart cleared successfully.";
     }
 }

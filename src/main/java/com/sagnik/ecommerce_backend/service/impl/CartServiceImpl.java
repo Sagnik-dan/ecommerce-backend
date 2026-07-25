@@ -1,13 +1,16 @@
 package com.sagnik.ecommerce_backend.service.impl;
-
 import com.sagnik.ecommerce_backend.dto.AddToCartRequest;
 import com.sagnik.ecommerce_backend.dto.CartItemResponse;
 import com.sagnik.ecommerce_backend.dto.CartResponse;
+import com.sagnik.ecommerce_backend.dto.UpdateCartItemRequest;
 import com.sagnik.ecommerce_backend.entity.Cart;
 import com.sagnik.ecommerce_backend.entity.CartItem;
 import com.sagnik.ecommerce_backend.entity.Product;
 import com.sagnik.ecommerce_backend.entity.User;
+import com.sagnik.ecommerce_backend.exception.CartItemNotFoundException;
+import com.sagnik.ecommerce_backend.exception.CartNotFoundException;
 import com.sagnik.ecommerce_backend.exception.ProductNotFoundException;
+import com.sagnik.ecommerce_backend.exception.UserNotFoundException;
 import com.sagnik.ecommerce_backend.repository.CartItemRepository;
 import com.sagnik.ecommerce_backend.repository.CartRepository;
 import com.sagnik.ecommerce_backend.repository.ProductRepository;
@@ -36,7 +39,7 @@ public class CartServiceImpl implements CartService {
 
         User user = userRepository.findById(userId)
                 .orElseThrow(() ->
-                        new RuntimeException("User not found"));
+                        new UserNotFoundException("User not found"));
 
         Cart cart = cartRepository.findByUserId(userId)
                 .orElseGet(() -> {
@@ -107,25 +110,78 @@ public class CartServiceImpl implements CartService {
 
         Cart cart = cartRepository.findByUserId(userId)
                 .orElseThrow(() ->
-                        new RuntimeException("Cart not found"));
+                        new CartNotFoundException("Cart not found"));
 
-        List<CartItemResponse> items =
-                cart.getCartItems()
-                        .stream()
-                        .map(item ->
-                                CartItemResponse.builder()
-                                        .productId(item.getProduct().getId())
-                                        .productName(item.getProduct().getName())
-                                        .price(item.getProduct().getPrice())
-                                        .quantity(item.getQuantity())
-                                        .subtotal(calculateItemTotal(item))
-                                        .build())
-                        .toList();
+        List<CartItemResponse> items = cart.getCartItems()
+                .stream()
+                .map(this::mapToCartItemResponse)
+                .toList();
 
         return CartResponse.builder()
                 .cartId(cart.getId())
+                .totalItems(cart.getCartItems().size())
                 .totalPrice(cart.getTotalPrice())
                 .items(items)
                 .build();
+    }
+    private CartItemResponse mapToCartItemResponse(
+            CartItem item) {
+
+        return CartItemResponse.builder()
+                .cartItemId(item.getId())
+                .productId(item.getProduct().getId())
+                .productName(item.getProduct().getName())
+                .unitPrice(item.getProduct().getPrice())
+                .quantity(item.getQuantity())
+                .subtotal(calculateItemTotal(item))
+                .build();
+    }
+
+    @Override
+    public void updateQuantity(
+            Long cartItemId,
+            UpdateCartItemRequest request) {
+
+        CartItem cartItem = cartItemRepository
+                .findById(cartItemId)
+                .orElseThrow(() ->
+                        new CartItemNotFoundException("Cart item not found"));
+
+        cartItem.setQuantity(request.getQuantity());
+
+        recalculateCartTotal(cartItem.getCart());
+
+        cartRepository.save(cartItem.getCart());
+    }
+
+    @Override
+    public void removeItem(Long cartItemId) {
+
+        CartItem cartItem = cartItemRepository
+                .findById(cartItemId)
+                .orElseThrow(() ->
+                        new CartItemNotFoundException("Cart item not found"));
+
+        Cart cart = cartItem.getCart();
+
+        cart.getCartItems().remove(cartItem);
+
+        recalculateCartTotal(cart);
+
+        cartRepository.save(cart);
+    }
+
+    @Override
+    public void clearCart(Long userId) {
+
+        Cart cart = cartRepository.findByUserId(userId)
+                .orElseThrow(() ->
+                        new CartNotFoundException("Cart not found"));
+
+        cart.getCartItems().clear();
+
+        recalculateCartTotal(cart);
+
+        cartRepository.save(cart);
     }
 }
