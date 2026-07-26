@@ -81,4 +81,26 @@ public class GlobalExceptionHandler {
                 ex.getMessage()
         );
     }
+
+    @ExceptionHandler(InsufficientStockException.class)
+    @ResponseStatus(HttpStatus.BAD_REQUEST)
+    public Map<String, String> handleInsufficientStock(
+            InsufficientStockException ex) {
+
+        return Map.of(
+                "error",
+                ex.getMessage()
+        );
+    }
+
+    @ExceptionHandler(CartEmptyException.class)
+    @ResponseStatus(HttpStatus.BAD_REQUEST)
+    public Map<String, String> handleCartIsEmpty(
+            CartEmptyException ex) {
+
+        return Map.of(
+                "error",
+                ex.getMessage()
+        );
+    }
 }

@@ -17,7 +17,7 @@ public class ProductRequest {
     private BigDecimal price;
 
     @NotNull
-    @PositiveOrZero
+    @Min(0)
     private Integer stock;
 
     private String imageUrl;
