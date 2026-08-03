@@ -103,4 +103,26 @@ public class GlobalExceptionHandler {
                 ex.getMessage()
         );
     }
+
+    @ExceptionHandler(OrderNotFoundException.class)
+    @ResponseStatus(HttpStatus.NOT_FOUND)
+    public Map<String, String> handleOrderNotFound(
+            OrderNotFoundException ex) {
+
+        return Map.of(
+                "error",
+                ex.getMessage()
+        );
+    }
+
+    @ExceptionHandler(InvalidOrderStateException.class)
+    @ResponseStatus(HttpStatus.BAD_REQUEST)
+    public Map<String, String> handleInvalidOrderState(
+            InvalidOrderStateException ex) {
+
+        return Map.of(
+                "error",
+                ex.getMessage()
+        );
+    }
 }

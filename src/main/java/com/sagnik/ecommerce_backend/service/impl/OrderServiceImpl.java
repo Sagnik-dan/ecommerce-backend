@@ -1,10 +1,11 @@
 package com.sagnik.ecommerce_backend.service.impl;
 
 import com.sagnik.ecommerce_backend.dto.CheckoutResponse;
+import com.sagnik.ecommerce_backend.dto.OrderDetailResponse;
+import com.sagnik.ecommerce_backend.dto.OrderItemResponse;
+import com.sagnik.ecommerce_backend.dto.OrderSummaryResponse;
 import com.sagnik.ecommerce_backend.entity.*;
-import com.sagnik.ecommerce_backend.exception.CartNotFoundException;
-import com.sagnik.ecommerce_backend.exception.InsufficientStockException;
-import com.sagnik.ecommerce_backend.exception.UserNotFoundException;
+import com.sagnik.ecommerce_backend.exception.*;
 import com.sagnik.ecommerce_backend.repository.CartRepository;
 import com.sagnik.ecommerce_backend.repository.OrderRepository;
 import com.sagnik.ecommerce_backend.repository.ProductRepository;
@@ -16,6 +17,7 @@ import org.springframework.stereotype.Service;
 
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
+import java.util.List;
 
 @Service
 @RequiredArgsConstructor
@@ -116,6 +118,112 @@ public class OrderServiceImpl implements OrderService {
     private BigDecimal calculateSubtotal(Product product, Integer quantity) {
         return product.getPrice()
                 .multiply(BigDecimal.valueOf(quantity));
+    }
+
+    @Override
+    public List<OrderSummaryResponse> getOrders(Long userId) {
+
+        User user = userRepository.findById(userId)
+                .orElseThrow(() ->
+                        new UserNotFoundException("User not found"));
+
+        List<Order> orders = orderRepository.findByUserId(user.getId());
+
+        return orders.stream()
+                .map(this::mapToOrderSummary)
+                .toList();
+    }
+
+    private OrderSummaryResponse mapToOrderSummary(Order order) {
+
+        return OrderSummaryResponse.builder()
+                .orderId(order.getId())
+                .orderDate(order.getOrderDate())
+                .status(order.getStatus())
+                .totalAmount(order.getTotalAmount())
+                .build();
+    }
+    @Override
+    public OrderDetailResponse getOrder(Long orderId) {
+
+        Order order = orderRepository.findById(orderId)
+                .orElseThrow(() ->
+                        new OrderNotFoundException("Order not found"));
+
+        return OrderDetailResponse.builder()
+                .orderId(order.getId())
+                .orderDate(order.getOrderDate())
+                .status(order.getStatus())
+                .totalAmount(order.getTotalAmount())
+                .items(
+                        order.getOrderItems()
+                                .stream()
+                                .map(this::mapToOrderItemResponse)
+                                .toList()
+                )
+                .build();
+    }
+
+    private OrderItemResponse mapToOrderItemResponse(
+            OrderItem item) {
+
+        return OrderItemResponse.builder()
+                .productName(item.getProductName())
+                .price(item.getPrice())
+                .quantity(item.getQuantity())
+                .subtotal(item.getSubtotal())
+                .build();
+    }
+
+    @Override
+    @Transactional
+    public OrderDetailResponse cancelOrder(Long orderId) {
+
+        Order order = orderRepository.findById(orderId)
+                .orElseThrow(() ->
+                        new OrderNotFoundException("Order not found"));
+
+        if (order.getStatus() == OrderStatus.CANCELLED) {
+
+            throw new InvalidOrderStateException(
+                    "Order is already cancelled."
+            );
+        }
+
+        if (order.getStatus() == OrderStatus.DELIVERED) {
+
+            throw new InvalidOrderStateException(
+                    "Delivered orders cannot be cancelled."
+            );
+        }
+
+        restoreStock(order);
+
+        order.setStatus(OrderStatus.CANCELLED);
+
+        orderRepository.save(order);
+
+        return getOrder(orderId);
+    }
+
+    private void restoreStock(Order order) {
+
+        for (OrderItem item : order.getOrderItems()) {
+
+            Product product = productRepository.findById(
+                    item.getProductId()
+            ).orElseThrow(() ->
+                    new ProductNotFoundException(
+                            "Product not found"
+                    )
+            );
+
+            product.setStock(
+                    product.getStock() + item.getQuantity()
+            );
+
+            productRepository.save(product);
+        }
     }
 
 }
