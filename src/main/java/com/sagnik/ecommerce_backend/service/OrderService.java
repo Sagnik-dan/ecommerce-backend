@@ -8,9 +8,9 @@ import java.util.List;
 
 public interface OrderService {
 
-    CheckoutResponse checkout(Long userId);
+    CheckoutResponse checkout();
 
-    List<OrderSummaryResponse> getOrders(Long userId);
+    List<OrderSummaryResponse> getOrders();
 
     OrderDetailResponse getOrder(Long orderId);
 

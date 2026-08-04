@@ -15,25 +15,19 @@ public class CartController {
 
     private final CartService cartService;
 
-    @PostMapping("/{userId}/add")
+    @PostMapping("/add")
     public String addToCart(
+            @RequestBody AddToCartRequest request) {
 
-            @PathVariable Long userId,
-
-            @Valid
-            @RequestBody
-            AddToCartRequest request) {
-
-        cartService.addToCart(userId, request);
+        cartService.addToCart(request);
 
         return "Product added to cart successfully.";
     }
 
-    @GetMapping("/{userId}")
-    public CartResponse getCart(
-            @PathVariable Long userId) {
+    @GetMapping
+    public CartResponse getCart() {
 
-        return cartService.getCart(userId);
+        return cartService.getCart();
     }
 
     @PutMapping("/items/{cartItemId}")
@@ -61,11 +55,10 @@ public class CartController {
         return "Item removed successfully.";
     }
 
-    @DeleteMapping("/{userId}")
-    public String clearCart(
-            @PathVariable Long userId) {
+    @DeleteMapping
+    public String clearCart() {
 
-        cartService.clearCart(userId);
+        cartService.clearCart();
 
         return "Cart cleared successfully.";
     }

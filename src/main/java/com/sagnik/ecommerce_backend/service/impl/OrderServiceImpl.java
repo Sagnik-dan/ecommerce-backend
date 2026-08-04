@@ -10,6 +10,7 @@ import com.sagnik.ecommerce_backend.repository.CartRepository;
 import com.sagnik.ecommerce_backend.repository.OrderRepository;
 import com.sagnik.ecommerce_backend.repository.ProductRepository;
 import com.sagnik.ecommerce_backend.repository.UserRepository;
+import com.sagnik.ecommerce_backend.security.AuthenticationService;
 import com.sagnik.ecommerce_backend.service.OrderService;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
@@ -23,25 +24,23 @@ import java.util.List;
 @RequiredArgsConstructor
 public class OrderServiceImpl implements OrderService {
 
-    private final UserRepository userRepository;
+    private final AuthenticationService authenticationService;
     private final CartRepository cartRepository;
     private final ProductRepository productRepository;
     private final OrderRepository orderRepository;
 
     @Override
     @Transactional
-    public CheckoutResponse checkout(Long userId) {
+    public CheckoutResponse checkout() {
 
-        User user = userRepository.findById(userId)
-                .orElseThrow(() ->
-                        new UserNotFoundException("User not found"));
+        User user = authenticationService.getAuthenticatedUser();
 
-        Cart cart = cartRepository.findByUserId(userId)
+        Cart cart = cartRepository.findByUserId(user.getId())
                 .orElseThrow(() ->
                         new CartNotFoundException("Cart not found"));
 
         if (cart.getCartItems().isEmpty()) {
-            throw new RuntimeException("Cart is empty");
+            throw new CartEmptyException("Cart is empty");
         }
 
         // Step 1: Validate stock
@@ -121,11 +120,9 @@ public class OrderServiceImpl implements OrderService {
     }
 
     @Override
-    public List<OrderSummaryResponse> getOrders(Long userId) {
+    public List<OrderSummaryResponse> getOrders() {
 
-        User user = userRepository.findById(userId)
-                .orElseThrow(() ->
-                        new UserNotFoundException("User not found"));
+        User user = authenticationService.getAuthenticatedUser();
 
         List<Order> orders = orderRepository.findByUserId(user.getId());
 

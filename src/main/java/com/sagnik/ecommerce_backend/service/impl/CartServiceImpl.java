@@ -10,11 +10,11 @@ import com.sagnik.ecommerce_backend.entity.User;
 import com.sagnik.ecommerce_backend.exception.CartItemNotFoundException;
 import com.sagnik.ecommerce_backend.exception.CartNotFoundException;
 import com.sagnik.ecommerce_backend.exception.ProductNotFoundException;
-import com.sagnik.ecommerce_backend.exception.UserNotFoundException;
 import com.sagnik.ecommerce_backend.repository.CartItemRepository;
 import com.sagnik.ecommerce_backend.repository.CartRepository;
 import com.sagnik.ecommerce_backend.repository.ProductRepository;
 import com.sagnik.ecommerce_backend.repository.UserRepository;
+import com.sagnik.ecommerce_backend.security.AuthenticationService;
 import com.sagnik.ecommerce_backend.service.CartService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
@@ -29,19 +29,17 @@ import java.util.Optional;
 @Transactional
 public class CartServiceImpl implements CartService {
 
-    private final CartRepository cartRepository;
+    private final AuthenticationService authenticationService;
     private final CartItemRepository cartItemRepository;
     private final ProductRepository productRepository;
-    private final UserRepository userRepository;
+    private final CartRepository cartRepository;
 
     @Override
-    public void addToCart(Long userId, AddToCartRequest request) {
+    public void addToCart(AddToCartRequest request) {
 
-        User user = userRepository.findById(userId)
-                .orElseThrow(() ->
-                        new UserNotFoundException("User not found"));
+        User user = authenticationService.getAuthenticatedUser();
 
-        Cart cart = cartRepository.findByUserId(userId)
+        Cart cart = cartRepository.findByUserId(user.getId())
                 .orElseGet(() -> {
 
                     Cart newCart = Cart.builder()
@@ -106,9 +104,11 @@ public class CartServiceImpl implements CartService {
     }
 
     @Override
-    public CartResponse getCart(Long userId) {
+    public CartResponse getCart() {
 
-        Cart cart = cartRepository.findByUserId(userId)
+        User user = authenticationService.getAuthenticatedUser();
+
+        Cart cart = cartRepository.findByUserId(user.getId())
                 .orElseThrow(() ->
                         new CartNotFoundException("Cart not found"));
 
@@ -172,9 +172,11 @@ public class CartServiceImpl implements CartService {
     }
 
     @Override
-    public void clearCart(Long userId) {
+    public void clearCart() {
 
-        Cart cart = cartRepository.findByUserId(userId)
+        User user = authenticationService.getAuthenticatedUser();
+
+        Cart cart = cartRepository.findByUserId(user.getId())
                 .orElseThrow(() ->
                         new CartNotFoundException("Cart not found"));
 

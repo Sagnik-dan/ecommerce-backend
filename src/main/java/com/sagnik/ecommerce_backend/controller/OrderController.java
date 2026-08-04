@@ -16,18 +16,16 @@ public class OrderController {
 
     private final OrderService orderService;
 
-    @PostMapping("/checkout/{userId}")
-    public CheckoutResponse checkout(
-            @PathVariable Long userId) {
+    @PostMapping("/checkout")
+    public CheckoutResponse checkout() {
 
-        return orderService.checkout(userId);
+        return orderService.checkout();
     }
 
-    @GetMapping("/user/{userId}")
-    public List<OrderSummaryResponse> getOrders(
-            @PathVariable Long userId) {
+    @GetMapping("")
+    public List<OrderSummaryResponse> getOrders() {
 
-        return orderService.getOrders(userId);
+        return orderService.getOrders();
     }
 
     @GetMapping("/{orderId}")
@@ -43,5 +41,5 @@ public class OrderController {
 
         return orderService.cancelOrder(orderId);
     }
-    
+
 }

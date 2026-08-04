@@ -3,14 +3,15 @@ package com.sagnik.ecommerce_backend.service;
 import com.sagnik.ecommerce_backend.dto.AddToCartRequest;
 import com.sagnik.ecommerce_backend.dto.CartResponse;
 import com.sagnik.ecommerce_backend.dto.UpdateCartItemRequest;
+import com.sagnik.ecommerce_backend.security.AuthenticationService;
 
 public interface CartService {
 
-    void addToCart(
-            Long userId,
-            AddToCartRequest request);
+    void addToCart(AddToCartRequest request);
 
-    CartResponse getCart(Long userId);
+    CartResponse getCart();
+
+    void clearCart();
 
     void updateQuantity(
             Long cartItemId,
@@ -18,6 +19,5 @@ public interface CartService {
 
     void removeItem(Long cartItemId);
 
-    void clearCart(Long userId);
 
 }
