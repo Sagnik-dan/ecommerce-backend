@@ -142,10 +142,22 @@ public class CartServiceImpl implements CartService {
             Long cartItemId,
             UpdateCartItemRequest request) {
 
+        User user = authenticationService.getAuthenticatedUser();
+
         CartItem cartItem = cartItemRepository
                 .findById(cartItemId)
                 .orElseThrow(() ->
-                        new CartItemNotFoundException("Cart item not found"));
+                        new CartItemNotFoundException(
+                                "Cart item not found"));
+
+        if (!cartItem.getCart()
+                .getUser()
+                .getId()
+                .equals(user.getId())) {
+
+            throw new CartItemNotFoundException(
+                    "Cart item not found");
+        }
 
         cartItem.setQuantity(request.getQuantity());
 
@@ -157,10 +169,22 @@ public class CartServiceImpl implements CartService {
     @Override
     public void removeItem(Long cartItemId) {
 
+        User user = authenticationService.getAuthenticatedUser();
+
         CartItem cartItem = cartItemRepository
                 .findById(cartItemId)
                 .orElseThrow(() ->
-                        new CartItemNotFoundException("Cart item not found"));
+                        new CartItemNotFoundException(
+                                "Cart item not found"));
+
+        if (!cartItem.getCart()
+                .getUser()
+                .getId()
+                .equals(user.getId())) {
+
+            throw new CartItemNotFoundException(
+                    "Cart item not found");
+        }
 
         Cart cart = cartItem.getCart();
 

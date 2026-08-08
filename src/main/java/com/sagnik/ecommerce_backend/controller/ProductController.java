@@ -71,4 +71,11 @@ public class ProductController {
                 maxPrice,
                 pageable);
     }
+
+    @GetMapping("/{id}")
+    public ProductResponse getProduct(
+            @PathVariable Long id) {
+
+        return productService.getProduct(id);
+    }
 }

@@ -6,6 +6,7 @@ import com.sagnik.ecommerce_backend.entity.Category;
 import com.sagnik.ecommerce_backend.entity.Product;
 import com.sagnik.ecommerce_backend.exception.CategoryNotFoundException;
 import com.sagnik.ecommerce_backend.exception.ProductNotFoundException;
+import com.sagnik.ecommerce_backend.mapper.ProductMapper;
 import com.sagnik.ecommerce_backend.repository.CategoryRepository;
 import com.sagnik.ecommerce_backend.repository.ProductRepository;
 import com.sagnik.ecommerce_backend.service.ProductService;
@@ -26,6 +27,7 @@ import java.util.List;
 public class ProductServiceImpl implements ProductService {
     private final ProductRepository productRepository;
     private final CategoryRepository categoryRepository;
+    private final ProductMapper productMapper;
     @Override
     public ProductResponse createProduct(ProductRequest request) {
 
@@ -36,36 +38,19 @@ public class ProductServiceImpl implements ProductService {
                                 new CategoryNotFoundException(
                                         "Category not found"));
 
-        Product product = Product.builder()
-                .name(request.getName())
-                .description(request.getDescription())
-                .price(request.getPrice())
-                .stock(request.getStock())
-                .category(category)
-                .build();
+        Product product = productMapper.toEntity(request);
+
+        product.setCategory(category);
 
         Product savedProduct =
                 productRepository.save(product);
 
-        return mapToResponse(savedProduct);
+        return productMapper.toResponse(savedProduct);
     }
     private ProductResponse mapToResponse(
             Product product) {
 
-        return ProductResponse.builder()
-                .id(product.getId())
-                .name(product.getName())
-                .description(product.getDescription())
-                .price(product.getPrice())
-                .stock(product.getStock())
-                .imageUrl(product.getImageUrl())
-                .categoryId(
-                        product.getCategory().getId()
-                )
-                .categoryName(
-                        product.getCategory().getName()
-                )
-                .build();
+        return productMapper.toResponse(product);
     }
 
     @Override
@@ -119,5 +104,16 @@ public class ProductServiceImpl implements ProductService {
         return productRepository
                 .findAll(specification, pageable)
                 .map(this::mapToResponse);
+    }
+
+    @Override
+    public ProductResponse getProduct(Long id) {
+
+        Product product = productRepository.findById(id)
+                .orElseThrow(() ->
+                        new ProductNotFoundException(
+                                "Product not found"));
+
+        return productMapper.toResponse(product);
     }
 }

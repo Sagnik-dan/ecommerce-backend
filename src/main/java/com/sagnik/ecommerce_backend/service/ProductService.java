@@ -19,4 +19,6 @@ public interface ProductService {
             BigDecimal minPrice,
             BigDecimal maxPrice,
             Pageable pageable);
+
+    ProductResponse getProduct(Long id);
 }

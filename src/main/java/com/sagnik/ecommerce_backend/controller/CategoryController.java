@@ -15,6 +15,8 @@ import org.springframework.data.domain.Pageable;
 
 import org.springframework.web.bind.annotation.*;
 
+import java.util.List;
+
 @RestController
 @RequestMapping("/api/categories")
 @RequiredArgsConstructor
@@ -31,18 +33,31 @@ public class CategoryController {
         return categoryService.createCategory(request);
     }
 
-    @PutMapping("/{id}")
-    public ProductResponse updateProduct(
-            @PathVariable Long id,
-            @Valid @RequestBody ProductRequest request) {
+    @GetMapping
+    public List<CategoryResponse> getAllCategories() {
 
-        return productService.updateProduct(id, request);
+        return categoryService.getAllCategories();
+    }
+
+    @GetMapping("/{id}")
+    public CategoryResponse getCategoryById(
+            @PathVariable Long id) {
+
+        return categoryService.getCategoryById(id);
+    }
+
+    @PutMapping("/{id}")
+    public CategoryResponse updateCategory(
+            @PathVariable Long id,
+            @Valid @RequestBody CategoryRequest request) {
+
+        return categoryService.updateCategory(id, request);
     }
 
     @DeleteMapping("/{id}")
-    public void deleteProduct(@PathVariable Long id) {
+    public void deleteCategory(
+            @PathVariable Long id) {
 
-        productService.deleteProduct(id);
+        categoryService.deleteCategory(id);
     }
-
 }

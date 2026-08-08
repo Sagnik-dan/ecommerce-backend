@@ -125,4 +125,15 @@ public class GlobalExceptionHandler {
                 ex.getMessage()
         );
     }
+
+    @ExceptionHandler(CategoryNotFoundException.class)
+    @ResponseStatus(HttpStatus.NOT_FOUND)
+    public Map<String, String> handleCategoryNotFound(
+            CategoryNotFoundException ex) {
+
+        return Map.of(
+                "error",
+                ex.getMessage()
+        );
+    }
 }
