@@ -93,7 +93,6 @@ public class OrderServiceImpl implements OrderService {
                     product.getStock() - cartItem.getQuantity()
             );
 
-            productRepository.save(product);
         }
 
         // Step 5: Save Order
@@ -143,9 +142,17 @@ public class OrderServiceImpl implements OrderService {
     @Override
     public OrderDetailResponse getOrder(Long orderId) {
 
+        User user = authenticationService.getAuthenticatedUser();
+
         Order order = orderRepository.findById(orderId)
                 .orElseThrow(() ->
-                        new OrderNotFoundException("Order not found"));
+                        new OrderNotFoundException(
+                                "Order not found"));
+
+        if (!order.getUser().getId().equals(user.getId())) {
+            throw new OrderNotFoundException(
+                    "Order not found");
+        }
 
         return OrderDetailResponse.builder()
                 .orderId(order.getId())
@@ -176,9 +183,17 @@ public class OrderServiceImpl implements OrderService {
     @Transactional
     public OrderDetailResponse cancelOrder(Long orderId) {
 
+        User user = authenticationService.getAuthenticatedUser();
+
         Order order = orderRepository.findById(orderId)
                 .orElseThrow(() ->
-                        new OrderNotFoundException("Order not found"));
+                        new OrderNotFoundException(
+                                "Order not found"));
+
+        if (!order.getUser().getId().equals(user.getId())) {
+            throw new OrderNotFoundException(
+                    "Order not found");
+        }
 
         if (order.getStatus() == OrderStatus.CANCELLED) {
 

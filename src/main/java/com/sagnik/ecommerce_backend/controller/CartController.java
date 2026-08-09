@@ -17,7 +17,7 @@ public class CartController {
 
     @PostMapping("/add")
     public String addToCart(
-            @RequestBody AddToCartRequest request) {
+            @Valid @RequestBody AddToCartRequest request) {
 
         cartService.addToCart(request);
 
