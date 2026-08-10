@@ -51,7 +51,8 @@ public class OrderServiceImpl implements OrderService {
             if (product.getStock() < cartItem.getQuantity()) {
 
                 throw new InsufficientStockException(
-                        product.getName() + " is out of stock."
+                        "Insufficient stock for product: "
+                                + product.getName()
                 );
             }
         }
