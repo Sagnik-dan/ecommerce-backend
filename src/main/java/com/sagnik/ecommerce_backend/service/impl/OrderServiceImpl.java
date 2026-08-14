@@ -147,12 +147,10 @@ public class OrderServiceImpl implements OrderService {
 
         Order order = orderRepository.findById(orderId)
                 .orElseThrow(() ->
-                        new OrderNotFoundException(
-                                "Order not found"));
+                        new OrderNotFoundException("Order not found"));
 
         if (!order.getUser().getId().equals(user.getId())) {
-            throw new OrderNotFoundException(
-                    "Order not found");
+            throw new OrderNotFoundException("Order not found");
         }
 
         return OrderDetailResponse.builder()
@@ -235,7 +233,6 @@ public class OrderServiceImpl implements OrderService {
                     product.getStock() + item.getQuantity()
             );
 
-            productRepository.save(product);
         }
     }
 

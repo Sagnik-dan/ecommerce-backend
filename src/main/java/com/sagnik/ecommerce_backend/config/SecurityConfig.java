@@ -32,106 +32,48 @@ public class SecurityConfig {
 
                 .authorizeHttpRequests(auth -> auth
 
-                        // =========================
-                        // PUBLIC ENDPOINTS
-                        // =========================
+                        // Public authentication endpoints
+                        .requestMatchers(
+                                "/api/auth/**"
+                        ).permitAll()
+
+                        // Public product/category reads
+                        .requestMatchers(
+                                org.springframework.http.HttpMethod.GET,
+                                "/api/products/**",
+                                "/api/categories/**"
+                        ).permitAll()
+
+                        // Admin-only product/category modifications
+                        .requestMatchers(
+                                org.springframework.http.HttpMethod.POST,
+                                "/api/products/**",
+                                "/api/categories/**"
+                        ).hasRole("ADMIN")
 
                         .requestMatchers(
-                                "/api/auth/**",
-                                "/api/test/public",
+                                org.springframework.http.HttpMethod.PUT,
+                                "/api/products/**",
+                                "/api/categories/**"
+                        ).hasRole("ADMIN")
+
+                        .requestMatchers(
+                                org.springframework.http.HttpMethod.DELETE,
+                                "/api/products/**",
+                                "/api/categories/**"
+                        ).hasRole("ADMIN")
+
+                        // Authenticated users
+                        .requestMatchers(
+                                "/api/cart/**",
+                                "/api/orders/**"
+                        ).authenticated()
+
+                        // Swagger
+                        .requestMatchers(
                                 "/swagger-ui/**",
                                 "/v3/api-docs/**"
-                        )
-                        .permitAll()
-
-
-                        // =========================
-                        // CATEGORY - READ
-                        // =========================
-
-                        .requestMatchers(
-                                HttpMethod.GET,
-                                "/api/categories/**"
-                        )
-                        .hasAnyAuthority("ADMIN", "CUSTOMER")
-
-
-                        // =========================
-                        // CATEGORY - ADMIN ONLY
-                        // =========================
-
-                        .requestMatchers(
-                                HttpMethod.POST,
-                                "/api/categories/**"
-                        )
-                        .hasAuthority("ADMIN")
-
-                        .requestMatchers(
-                                HttpMethod.PUT,
-                                "/api/categories/**"
-                        )
-                        .hasAuthority("ADMIN")
-
-                        .requestMatchers(
-                                HttpMethod.DELETE,
-                                "/api/categories/**"
-                        )
-                        .hasAuthority("ADMIN")
-
-
-                        // =========================
-                        // PRODUCT - READ
-                        // =========================
-
-                        .requestMatchers(
-                                HttpMethod.GET,
-                                "/api/products/**"
-                        )
-                        .hasAnyAuthority("ADMIN", "CUSTOMER")
-
-
-                        // =========================
-                        // PRODUCT - ADMIN ONLY
-                        // =========================
-
-                        .requestMatchers(
-                                HttpMethod.POST,
-                                "/api/products/**"
-                        )
-                        .hasAuthority("ADMIN")
-
-                        .requestMatchers(
-                                HttpMethod.PUT,
-                                "/api/products/**"
-                        )
-                        .hasAuthority("ADMIN")
-
-                        .requestMatchers(
-                                HttpMethod.DELETE,
-                                "/api/products/**"
-                        )
-                        .hasAuthority("ADMIN")
-
-
-                        // =========================
-                        // CART
-                        // =========================
-
-                        .requestMatchers("/api/cart/**")
-                        .hasAnyAuthority("ADMIN", "CUSTOMER")
-
-
-                        // =========================
-                        // ORDERS
-                        // =========================
-
-                        .requestMatchers("/api/orders/**")
-                        .hasAnyAuthority("ADMIN", "CUSTOMER")
-
-
-                        // =========================
-                        // EVERYTHING ELSE
-                        // =========================
+                        ).permitAll()
 
                         .anyRequest()
                         .authenticated()

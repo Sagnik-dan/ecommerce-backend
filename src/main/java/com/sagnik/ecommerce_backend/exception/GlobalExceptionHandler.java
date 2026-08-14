@@ -86,7 +86,7 @@ public class GlobalExceptionHandler {
     }
 
     @ExceptionHandler(InsufficientStockException.class)
-    @ResponseStatus(HttpStatus.BAD_REQUEST)
+    @ResponseStatus(HttpStatus.CONFLICT)
     public Map<String, String> handleInsufficientStock(
             InsufficientStockException ex) {
 
