@@ -4,6 +4,7 @@ import com.sagnik.ecommerce_backend.dto.CheckoutResponse;
 import com.sagnik.ecommerce_backend.dto.OrderDetailResponse;
 import com.sagnik.ecommerce_backend.dto.OrderSummaryResponse;
 import com.sagnik.ecommerce_backend.service.OrderService;
+import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.*;
 
@@ -12,6 +13,7 @@ import java.util.List;
 @RestController
 @RequestMapping("/api/orders")
 @RequiredArgsConstructor
+@SecurityRequirement(name = "bearerAuth")
 public class OrderController {
 
     private final OrderService orderService;

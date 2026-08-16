@@ -4,6 +4,7 @@ import com.sagnik.ecommerce_backend.dto.AddToCartRequest;
 import com.sagnik.ecommerce_backend.dto.CartResponse;
 import com.sagnik.ecommerce_backend.dto.UpdateCartItemRequest;
 import com.sagnik.ecommerce_backend.service.CartService;
+import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.*;
@@ -11,6 +12,7 @@ import org.springframework.web.bind.annotation.*;
 @RestController
 @RequestMapping("/api/cart")
 @RequiredArgsConstructor
+@SecurityRequirement(name = "bearerAuth")
 public class CartController {
 
     private final CartService cartService;

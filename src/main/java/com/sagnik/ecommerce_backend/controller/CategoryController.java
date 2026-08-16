@@ -6,8 +6,10 @@ import com.sagnik.ecommerce_backend.dto.ProductRequest;
 import com.sagnik.ecommerce_backend.dto.ProductResponse;
 import com.sagnik.ecommerce_backend.service.CategoryService;
 import com.sagnik.ecommerce_backend.service.ProductService;
+import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
+import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.*;
 
 import org.springframework.data.domain.Page;
@@ -27,6 +29,8 @@ public class CategoryController {
 
 
     @PostMapping
+    @ResponseStatus(HttpStatus.CREATED)
+    @SecurityRequirement(name = "bearerAuth")
     public CategoryResponse createCategory(
             @Valid @RequestBody CategoryRequest request) {
 
@@ -47,6 +51,7 @@ public class CategoryController {
     }
 
     @PutMapping("/{id}")
+    @SecurityRequirement(name = "bearerAuth")
     public CategoryResponse updateCategory(
             @PathVariable Long id,
             @Valid @RequestBody CategoryRequest request) {
@@ -55,6 +60,8 @@ public class CategoryController {
     }
 
     @DeleteMapping("/{id}")
+    @ResponseStatus(HttpStatus.NO_CONTENT)
+    @SecurityRequirement(name = "bearerAuth")
     public void deleteCategory(
             @PathVariable Long id) {
 

@@ -6,8 +6,10 @@ import com.sagnik.ecommerce_backend.dto.ProductRequest;
 import com.sagnik.ecommerce_backend.dto.ProductResponse;
 import com.sagnik.ecommerce_backend.service.CategoryService;
 import com.sagnik.ecommerce_backend.service.ProductService;
+import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
+import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.*;
 
 import org.springframework.data.domain.Page;
@@ -26,6 +28,8 @@ public class ProductController {
     private final ProductService productService;
 
     @PostMapping
+    @ResponseStatus(HttpStatus.CREATED)
+    @SecurityRequirement(name = "bearerAuth")
     public ProductResponse createProduct(
             @Valid @RequestBody ProductRequest request) {
 
@@ -34,6 +38,7 @@ public class ProductController {
 
 
     @PutMapping("/{id}")
+    @SecurityRequirement(name = "bearerAuth")
     public ProductResponse updateProduct(
             @PathVariable Long id,
             @Valid @RequestBody ProductRequest request) {
@@ -42,6 +47,8 @@ public class ProductController {
     }
 
     @DeleteMapping("/{id}")
+    @ResponseStatus(HttpStatus.NO_CONTENT)
+    @SecurityRequirement(name = "bearerAuth")
     public void deleteProduct(@PathVariable Long id) {
 
         productService.deleteProduct(id);
