@@ -232,7 +232,7 @@ public class OrderServiceImpl implements OrderService {
             product.setStock(
                     product.getStock() + item.getQuantity()
             );
-
+            productRepository.save(product);
         }
     }
 
